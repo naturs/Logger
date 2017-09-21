@@ -1,0 +1,5 @@
+rootProject.name = 'Logger'
+include 'logger-core'
+include 'logger-android'
+include 'sample'
+

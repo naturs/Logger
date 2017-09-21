@@ -1,0 +1,35 @@
+apply plugin: 'java'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+    }
+}
+
+ext {
+    version = '0.1'
+    junit = 'junit:junit:4.12'
+    json = 'org.json:json:20160212'
+    androidLib = 'com.google.android:android:4.1.1.4'
+    jetbrainsAnnotations = 'org.jetbrains:annotations:15.0'
+}
+
+allprojects {
+    group 'com.github.naturs.logger'
+    version rootProject.ext.version
+
+    apply plugin: 'java'
+
+    sourceCompatibility = JavaVersion.VERSION_1_7
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+

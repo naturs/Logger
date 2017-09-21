@@ -1,0 +1,6 @@
+dependencies {
+    compile rootProject.ext.json
+    compileOnly rootProject.ext.jetbrainsAnnotations
+    compile project(':logger-core')
+    testCompile rootProject.ext.junit
+}

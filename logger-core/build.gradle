@@ -1,0 +1,32 @@
+dependencies {
+    compileOnly rootProject.ext.json
+    compileOnly rootProject.ext.jetbrainsAnnotations
+    testCompile rootProject.ext.json
+    testCompile rootProject.ext.junit
+}
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'logger-core'
+    publishedGroupId = 'com.github.naturs.logger'
+    libraryName = 'logger-core'
+    artifact = 'logger-core'
+
+    libraryDescription = 'A java library for log.'
+
+    siteUrl = 'https://github.com/naturs/Logger/'
+    gitUrl = 'https://github.com/naturs/Logger.git'
+
+    libraryVersion = version
+
+    developerId = 'naturs'
+    developerName = 'Naturs'
+    developerEmail = 'naturs@users.noreply.github.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
