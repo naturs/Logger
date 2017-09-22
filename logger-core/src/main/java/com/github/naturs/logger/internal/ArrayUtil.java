@@ -1,6 +1,4 @@
-package com.github.naturs.logger;
-
-import com.github.naturs.logger.internal.ObjectConverter;
+package com.github.naturs.logger.internal;
 
 import java.util.Arrays;
 
