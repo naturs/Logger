@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.github.naturs.logger.Logger.*;
@@ -109,27 +108,31 @@ public final class Utils {
             return null;
         }
 
-        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        final int stackLength = stackTrace.length;
+
         int index = getStackTraceElementIndex(stackTrace, invokeClass);
         if (index == -1) {
             return null;
         }
 
-        int stackOffset = index + methodOffset;
+        int offset1 = Math.min(stackLength - 1, index + methodOffset);
 
         // corresponding method count with the current stack may exceeds the stack trace. Trims the count
-        if (methodCount + stackOffset > stackTrace.length) {
-            methodCount = stackTrace.length - stackOffset - 1;
+        if (methodCount + offset1 - 1 > stackLength) {
+            methodCount = stackLength - offset1 - 1;
         }
+        offset1 = Math.max(0, Math.min(stackLength - 1, offset1));
+
+        int offset2 = Math.max(0, Math.min(stackLength - 1, methodCount + offset1 - 1));
+
+        int startIndex = Math.max(offset1, offset2);
+        int endIndex = Math.min(offset1, offset2);
 
         List<StackTraceElement> targetElements = new ArrayList<>();
 
-        for (int i = methodCount; i > 0; i--) {
-            int stackIndex = i + stackOffset;
-            if (stackIndex >= stackTrace.length) {
-                continue;
-            }
-            targetElements.add(stackTrace[stackIndex]);
+        for (int i = startIndex; i >= endIndex; i--) {
+            targetElements.add(stackTrace[i]);
         }
 
         return targetElements.toArray(new StackTraceElement[targetElements.size()]);
