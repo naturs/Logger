@@ -12,7 +12,7 @@ public class ConverterStrategyTest {
     @Before
     public void setup() {
         ObjectConverter.add(new PrimaryConverterStrategy()); // int、boolean
-        ObjectConverter.add(new PrimaryArrayConverterStrategy()); // int[]、boolean[]
+        ObjectConverter.add(new ArrayConverterStrategy()); // int[]、boolean[]
         ObjectConverter.add(new CollectionConverterStrategy());
         ObjectConverter.add(new MapConverterStrategy()); // map
         ObjectConverter.add(new ThrowableConverterStrategy());

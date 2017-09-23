@@ -19,7 +19,7 @@ import java.util.Locale;
  */
 public class CsvFormatStrategy implements FormatStrategy {
 
-  private static final String NEW_LINE = System.getProperty("line.separator");
+  private static final String NEW_LINE = "\n";
   private static final String NEW_LINE_REPLACEMENT = " <br> ";
   private static final String SEPARATOR = ",";
 

@@ -1,12 +1,14 @@
 package com.github.naturs.logger.internal;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * From:
  * https://github.com/pengwei1024/LogUtils/blob/master/library/src/main/java/com/apkfuns/logutils/utils/ArrayUtil.java
  */
 public final class ArrayUtil {
+
+    private static final String BR = "\n";
 
     private ArrayUtil() {
     }
@@ -41,18 +43,16 @@ public final class ArrayUtil {
     public static char getType(Object object) {
         if (isArray(object)) {
             String str = object.toString();
-            System.out.println("getType:" + str);
             return str.substring(str.lastIndexOf("[") + 1, str.lastIndexOf("[") + 2).charAt(0);
         }
         return 0;
     }
 
-    /**
-     * 遍历数组
-     */
-    private static void traverseArray(StringBuilder result, Object array) {
+    private static void traverseArray(List<String> list, Object array, int level, int indent) {
         if (isArray(array)) {
             if (getArrayDimension(array) == 1) {
+                StringBuilder result = new StringBuilder();
+                result.append(Utils.getSpace(level));
                 switch (getType(array)) {
                     case 'I':
                         result.append(Arrays.toString((int[]) array));
@@ -80,15 +80,12 @@ public final class ArrayUtil {
                         break;
                     case 'L':
                         Object[] objects = (Object[]) array;
+                        // [A, B, C, D...]
                         result.append("[");
                         for (int i = 0; i < objects.length; ++i) {
-                            if (objects[i] == null) {
-                                result.append("NULL");
-                            } else {
-                                result.append(ObjectConverter.convert(null, objects[i]));
-                            }
+                            result.append(objToString(objects[i]));
                             if (i != objects.length - 1) {
-                                result.append(",");
+                                result.append(",  ");
                             }
                         }
                         result.append("]");
@@ -97,29 +94,111 @@ public final class ArrayUtil {
                         result.append(Arrays.toString((Object[]) array));
                         break;
                 }
+                list.add(result.toString());
             } else {
-                result.append("[");
+                list.add(Utils.getSpace(level) + "[");
+                list.add(BR);
                 for (int i = 0; i < ((Object[]) array).length; i++) {
-                    traverseArray(result, ((Object[]) array)[i]);
+                    traverseArray(list, ((Object[]) array)[i], level + indent, indent);
                     if (i != ((Object[]) array).length - 1) {
-                        result.append(",");
+                        list.add(BR);
                     }
                 }
-                result.append("]");
+                list.add(BR);
+                if (level > 0) {
+                    list.add(Utils.getSpace(level));
+                }
+                list.add("]");
             }
         } else {
-            result.append("not a array!!");
+            list.add("not a array!!");
         }
+    }
+
+    private static String objToString(Object obj) {
+        if (obj == null) {
+            return "NULL";
+        }
+        if (isPrimitiveClass(obj.getClass()) || obj instanceof CharSequence) {
+            return obj.toString();
+        }
+        return obj.getClass().getSimpleName();
+    }
+
+    /**
+     *
+     * @param clz
+     * @return
+     */
+    public static boolean isPrimitiveClass(Class clz) {
+        if (clz.isPrimitive()) {
+            return true;
+        }
+        try {
+            return ((Class) clz.getField("TYPE").get(null)).isPrimitive();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    static void printFormattedArray(List<String> list) {
+        int lastMaxDividerIndex = 0;
+        for (;;) {
+
+            int maxDividerIndex = -1;
+            Map<Integer, Integer> dividerIndexMap = new HashMap<>(list.size());
+            for (int i = 0; i < list.size(); i++) {
+                String item = list.get(i);
+                int dividerIndex = item.indexOf(',', lastMaxDividerIndex + 1);
+                if (dividerIndex == -1) {
+                    continue;
+                }
+                dividerIndexMap.put(i, dividerIndex);
+                maxDividerIndex = Math.max(maxDividerIndex, dividerIndex);
+            }
+
+            if (dividerIndexMap.size() <= 1) {
+                break;
+            }
+
+            lastMaxDividerIndex = maxDividerIndex;
+
+            for (Map.Entry<Integer, Integer> entry : dividerIndexMap.entrySet()) {
+                int tempIndex = entry.getKey();
+                int tempDividerIndex = entry.getValue();
+
+                if (tempDividerIndex < maxDividerIndex) {
+                    StringBuilder builder = new StringBuilder(list.get(tempIndex));
+                    builder.insert(tempDividerIndex + 1, Utils.getSpace(maxDividerIndex - tempDividerIndex));
+                    list.set(tempIndex, builder.toString());
+                }
+            }
+        }
+    }
+
+    public static String parseArray(Object array, int indent) {
+        return parseArray(array, 0, indent);
     }
 
     /**
      * 将数组内容转化为字符串
      */
-    public static String parseArray(Object array) {
+    public static String parseArray(Object array, int level, int indent) {
         StringBuilder result = new StringBuilder();
-        traverseArray(result, array);
+        List<String> list = parseArrayToList(array, level, indent);
+
+        for (String s : list) {
+            result.append(s);
+        }
         return result.toString();
     }
 
+    public static List<String> parseArrayToList(Object array, int level, int indent) {
+        List<String> list = new ArrayList<>();
+        traverseArray(list, array, level, indent);
 
+        printFormattedArray(list);
+
+        return list;
+    }
 }

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface ConverterStrategy {
 
-    String DEFAULT_DIVIDER = System.getProperty("line.separator");
+    String DEFAULT_DIVIDER = /*System.getProperty("line.separator")*/"\n";
 
     String convert(@Nullable String message, @NotNull Object object, int level);
 

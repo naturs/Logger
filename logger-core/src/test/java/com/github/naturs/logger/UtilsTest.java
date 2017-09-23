@@ -1,5 +1,6 @@
 package com.github.naturs.logger;
 
+import com.github.naturs.logger.internal.ArrayUtil;
 import com.github.naturs.logger.internal.ObjectConverter;
 import com.github.naturs.logger.internal.Utils;
 import com.github.naturs.logger.strategy.converter.*;
@@ -15,7 +16,7 @@ public class UtilsTest {
     @Before
     public void setup() {
         ObjectConverter.add(new PrimaryConverterStrategy()); // int、boolean
-        ObjectConverter.add(new PrimaryArrayConverterStrategy()); // int[]、boolean[]
+        ObjectConverter.add(new ArrayConverterStrategy()); // int[]、boolean[]
         ObjectConverter.add(new CollectionConverterStrategy());
         ObjectConverter.add(new MapConverterStrategy()); // map
         ObjectConverter.add(new ThrowableConverterStrategy());
@@ -50,7 +51,7 @@ public class UtilsTest {
 
         int[][][] b = new int[][][]{{{1,2,3},{32},{23234},{3},{34}},{{4},{4},{5},{6},{8}}};
 
-        System.out.println(ArrayUtil.parseArray(a));
+        System.out.println(ArrayUtil.parseArray(a, 4));
         System.out.println(Arrays.deepToString(a));
     }
 

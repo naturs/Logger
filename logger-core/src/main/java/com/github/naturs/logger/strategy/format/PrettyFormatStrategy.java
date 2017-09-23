@@ -7,7 +7,7 @@ import com.github.naturs.logger.strategy.log.DefaultLogStrategy;
 import com.github.naturs.logger.strategy.log.LogStrategy;
 
 public class PrettyFormatStrategy implements FormatStrategy {
-    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    public static final String LINE_SEPARATOR = "\n";
     
     /**
      * Android's max limit for a log entry is ~4076 bytes,
