@@ -3,6 +3,8 @@ package com.github.naturs.logger.adapter;
 import com.github.naturs.logger.strategy.format.FormatStrategy;
 import com.github.naturs.logger.strategy.format.PrettyFormatStrategy;
 import com.github.naturs.logger.strategy.log.DefaultLogStrategy;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class DefaultLogAdapter implements LogAdapter {
     
@@ -33,16 +35,11 @@ public class DefaultLogAdapter implements LogAdapter {
     }
     
     @Override
-    public void log(int priority, String tag, String message) {
-        formatStrategy.log(priority, tag, message);
-    }
-    
-    @Override
-    public void log(int priority, String tag, String message, FormatStrategy strategy) {
+    public void log(int priority, String tag, String message, @Nullable FormatStrategy strategy, @NotNull Class[] invokeClass) {
         if (strategy != null) {
-            strategy.log(priority, tag, message);
+            strategy.log(priority, tag, message, invokeClass);
         } else {
-            formatStrategy.log(priority, tag, message);
+            formatStrategy.log(priority, tag, message, invokeClass);
         }
     }
 }

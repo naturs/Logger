@@ -15,7 +15,9 @@ public interface Printer {
     Printer tag(String tag);
     
     Printer strategy(FormatStrategy strategy);
-    
+
+    Printer invokeClass(Class clazz);
+
     void d(String message, Object... args);
     
     void e(String message, Object... args);
@@ -50,7 +52,8 @@ public interface Printer {
 
     void obj(int priority, String message, Object object);
 
-    void log(int priority, String tag, String message, Throwable throwable, @Nullable FormatStrategy strategy);
+    void log(int priority, String tag, String message, Throwable throwable,
+             @Nullable FormatStrategy strategy, @Nullable Class invokeClass);
     
     /**
      * add adapter to process logs

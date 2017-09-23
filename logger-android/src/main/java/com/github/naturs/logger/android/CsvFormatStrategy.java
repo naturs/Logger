@@ -39,7 +39,7 @@ public class CsvFormatStrategy implements FormatStrategy {
     return new Builder();
   }
 
-  @Override public void log(int priority, String onceOnlyTag, String message) {
+  @Override public void log(int priority, String onceOnlyTag, String message, Class[] invokeClass) {
     String tag = formatTag(onceOnlyTag);
 
     date.setTime(System.currentTimeMillis());

@@ -1,7 +1,5 @@
 package com.github.naturs.logger.strategy.format;
 
-import com.github.naturs.logger.Logger;
-import com.github.naturs.logger.LoggerPrinter;
 import com.github.naturs.logger.internal.Utils;
 import com.github.naturs.logger.strategy.log.DefaultLogStrategy;
 import com.github.naturs.logger.strategy.log.LogStrategy;
@@ -15,11 +13,6 @@ public class PrettyFormatStrategy implements FormatStrategy {
      * is UTF-8
      */
     private static final int CHUNK_SIZE = 4000;
-    
-    /**
-     * The minimum stack trace index, starts at this class after two native calls.
-     */
-    private static final int MIN_STACK_OFFSET = 5;
     
     /**
      * Drawing toolbox
@@ -55,7 +48,7 @@ public class PrettyFormatStrategy implements FormatStrategy {
     }
     
     @Override
-    public void log(int priority, String onceOnlyTag, String message) {
+    public void log(int priority, String onceOnlyTag, String message, Class[] invokeClass) {
         String tag = formatTag(onceOnlyTag);
         
         // get bytes of message with system's default charset (which is UTF-8 for Android)
@@ -68,12 +61,12 @@ public class PrettyFormatStrategy implements FormatStrategy {
                 && length <= CHUNK_SIZE
                 && methodCount <= 1
                 && !message.trim().contains(LINE_SEPARATOR)) {
-            logContentSingleLine(priority, tag, message);
+            logContentSingleLine(priority, tag, message, invokeClass);
             return;
         }
         
         logTopBorder(priority, tag);
-        logHeaderContent(priority, tag, methodCount);
+        logHeaderContent(priority, tag, methodCount, invokeClass);
         
         if (length <= CHUNK_SIZE) {
             if (methodCount > 0) {
@@ -99,41 +92,33 @@ public class PrettyFormatStrategy implements FormatStrategy {
     }
     
     @SuppressWarnings("StringBufferReplaceableByString")
-    private void logHeaderContent(int logType, String tag, int methodCount) {
-        StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+    private void logHeaderContent(int logType, String tag, int methodCount, Class[] invokeClass) {
         if (showThreadInfo) {
             logChunk(logType, tag, HORIZONTAL_LINE + " Thread: " + Thread.currentThread().getName());
             logDivider(logType, tag);
         }
         String level = "";
-        
-        int stackOffset = getStackOffset(trace) + methodOffset;
-        
-        //corresponding method count with the current stack may exceeds the stack trace. Trims the count
-        if (methodCount + stackOffset > trace.length) {
-            methodCount = trace.length - stackOffset - 1;
-        }
-        
-        for (int i = methodCount; i > 0; i--) {
-            int stackIndex = i + stackOffset;
-            if (stackIndex >= trace.length) {
-                continue;
+
+        StackTraceElement[] elements = Utils.getStackTraceElement(invokeClass, methodCount, methodOffset);
+
+        if (!Utils.isEmpty(elements)) {
+            for (StackTraceElement element : elements) {
+                StringBuilder builder = new StringBuilder();
+                builder.append(HORIZONTAL_LINE)
+                        .append(' ')
+                        .append(level)
+                        .append(Utils.getSimpleClassName(element.getClassName()))
+                        .append(".")
+                        .append(element.getMethodName())
+                        .append(" ")
+                        .append(" (")
+                        .append(element.getFileName())
+                        .append(":")
+                        .append(element.getLineNumber())
+                        .append(")");
+                level += "   ";
+                logChunk(logType, tag, builder.toString());
             }
-            StringBuilder builder = new StringBuilder();
-            builder.append(HORIZONTAL_LINE)
-                    .append(' ')
-                    .append(level)
-                    .append(Utils.getSimpleClassName(trace[stackIndex].getClassName()))
-                    .append(".")
-                    .append(trace[stackIndex].getMethodName())
-                    .append(" ")
-                    .append(" (")
-                    .append(trace[stackIndex].getFileName())
-                    .append(":")
-                    .append(trace[stackIndex].getLineNumber())
-                    .append(")");
-            level += "   ";
-            logChunk(logType, tag, builder.toString());
         }
     }
     
@@ -152,34 +137,18 @@ public class PrettyFormatStrategy implements FormatStrategy {
         }
     }
     
-    private void logContentSingleLine(int logType, String tag, String chunk) {
-        StackTraceElement trace = Utils.getStackTraceElement(Logger.class);
+    private void logContentSingleLine(int logType, String tag, String chunk, Class... invokeClass) {
+        StackTraceElement trace = Utils.getStackTraceElement(invokeClass);
         if (trace == null) {
-            trace = Utils.getStackTraceElement(LoggerPrinter.class);
+            logChunk(logType, tag, chunk);
+        } else {
+            String methodInfo = Utils.getMethodInfo(trace);
+            logChunk(logType, tag, methodInfo + " " + chunk);
         }
-        String methodInfo = Utils.getMethodInfo(trace);
-        logChunk(logType, tag, methodInfo + " " + chunk);
     }
     
     private void logChunk(int priority, String tag, String chunk) {
         logStrategy.log(priority, tag, chunk);
-    }
-    
-    /**
-     * Determines the starting index of the stack trace, after method calls made by this class.
-     *
-     * @param trace the stack trace
-     * @return the stack offset
-     */
-    private int getStackOffset(StackTraceElement[] trace) {
-        for (int i = MIN_STACK_OFFSET; i < trace.length; i++) {
-            StackTraceElement e = trace[i];
-            String name = e.getClassName();
-            if (!name.equals(LoggerPrinter.class.getName()) && !name.equals(Logger.class.getName())) {
-                return --i;
-            }
-        }
-        return -1;
     }
     
     private String formatTag(String tag) {

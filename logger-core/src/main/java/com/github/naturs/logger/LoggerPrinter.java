@@ -4,6 +4,7 @@ import com.github.naturs.logger.adapter.LogAdapter;
 import com.github.naturs.logger.internal.ObjectConverter;
 import com.github.naturs.logger.internal.Utils;
 import com.github.naturs.logger.strategy.format.FormatStrategy;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public final class LoggerPrinter implements Printer {
     
     private static final int MAX_TAG_LENGTH = 23;
     
-    private static final int CALL_STACK_INDEX = 5;
+    private static final String DEFAULT_LOG_TAG = "Logger";
     
     /**
      * Provides one-time used tag for the log message
@@ -27,7 +28,9 @@ public final class LoggerPrinter implements Printer {
     private final ThreadLocal<String> explicitTag = new ThreadLocal<>();
     
     private final ThreadLocal<FormatStrategy> explicitStrategy = new ThreadLocal<>();
-    
+
+    private final ThreadLocal<Class> explicitInvokeClass = new ThreadLocal<>();
+
     private final LoggerAdapter logAdapters = new LoggerAdapter();
     
     @Override
@@ -50,7 +53,15 @@ public final class LoggerPrinter implements Printer {
         }
         return this;
     }
-    
+
+    @Override
+    public Printer invokeClass(Class clazz) {
+        if (clazz != null) {
+            explicitInvokeClass.set(clazz);
+        }
+        return this;
+    }
+
     @Override
     public void d(String message, Object... args) {
         log(DEBUG, null, message, args);
@@ -129,7 +140,7 @@ public final class LoggerPrinter implements Printer {
 
     @Override
     public synchronized void log(int priority, String tag, String message, Throwable throwable,
-                                 @Nullable FormatStrategy strategy) {
+                                 @Nullable FormatStrategy strategy, @Nullable Class invokeClass) {
         if (throwable != null && message != null) {
             message += " : " + Utils.getStackTraceString(throwable);
         }
@@ -140,7 +151,7 @@ public final class LoggerPrinter implements Printer {
             return;
         }
 
-        logAdapters.log(priority, tag, message, strategy);
+        logAdapters.log(priority, tag, message, strategy, getCompleteInvokeClass(invokeClass));
     }
 
     @Override
@@ -157,28 +168,27 @@ public final class LoggerPrinter implements Printer {
      * This method is synchronized in order to avoid messy of logs' order.
      */
     private synchronized void log(int priority, Throwable throwable, String msg, Object... args) {
-        String tag = getTag();
+        Class invokeClass = getInvokeClass();
+        String tag = getTag(invokeClass);
         FormatStrategy strategy = getFormatStrategy();
         String message = createMessage(msg, args);
-        log(priority, tag, message, throwable, strategy);
+        log(priority, tag, message, throwable, strategy, invokeClass);
     }
     
     /**
      * @return the appropriate tag based on local or global
      */
-    private String getTag() {
+    private String getTag(Class invokeClass) {
         String tag = explicitTag.get();
         if (tag != null) {
             explicitTag.remove();
             return tag;
         }
-        StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-        if (stackTrace.length <= CALL_STACK_INDEX) {
-//            throw new IllegalStateException(
-//                    "Synthetic stacktrace didn't have enough elements: are you using proguard?");
+        StackTraceElement element = Utils.getStackTraceElement(getCompleteInvokeClass(invokeClass));
+        if (element != null) {
+            return createStackElementTag(element);
         }
-//        return createStackElementTag(stackTrace[CALL_STACK_INDEX]);
-        return "xxx";
+        return DEFAULT_LOG_TAG;
     }
     
     private FormatStrategy getFormatStrategy() {
@@ -186,6 +196,15 @@ public final class LoggerPrinter implements Printer {
         if (strategy != null) {
             explicitTag.remove();
             return strategy;
+        }
+        return null;
+    }
+
+    private Class getInvokeClass() {
+        Class clazz = explicitInvokeClass.get();
+        if (clazz != null) {
+            explicitInvokeClass.remove();
+            return clazz;
         }
         return null;
     }
@@ -211,6 +230,13 @@ public final class LoggerPrinter implements Printer {
         return tag.length() > MAX_TAG_LENGTH ? tag.substring(0, MAX_TAG_LENGTH) : tag;
     }
 
+    private Class[] getCompleteInvokeClass(Class invokeClass) {
+        return new Class[]{
+                // attention the order.
+                invokeClass, Logger.class, LoggerPrinter.class
+        };
+    }
+
     /**
      * manage all adapters.
      */
@@ -233,10 +259,11 @@ public final class LoggerPrinter implements Printer {
             logAdapters.clear();
         }
 
-        public void log(int priority, String tag, String message, @Nullable FormatStrategy strategy) {
+        public void log(int priority, String tag, String message,
+                        @Nullable FormatStrategy strategy, @NotNull Class[] invokeClass) {
             for (LogAdapter adapter : logAdapters) {
                 if (adapter.isLoggable(priority, tag)) {
-                    adapter.log(priority, tag, message, strategy);
+                    adapter.log(priority, tag, message, strategy, invokeClass);
                 }
             }
         }

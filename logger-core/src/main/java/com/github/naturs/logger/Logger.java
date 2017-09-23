@@ -4,6 +4,7 @@ import com.github.naturs.logger.adapter.LogAdapter;
 import com.github.naturs.logger.internal.ObjectConverter;
 import com.github.naturs.logger.strategy.converter.ConverterStrategy;
 import com.github.naturs.logger.strategy.format.FormatStrategy;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * But more pretty, simple and powerful
@@ -64,11 +65,16 @@ public final class Logger {
         return printer.strategy(strategy);
     }
 
+    public static Printer invokeClass(Class clazz) {
+        return printer.invokeClass(clazz);
+    }
+
     /**
      * General log function that accepts all configurations as parameter
      */
-    public static void log(int priority, String tag, String message, Throwable throwable, FormatStrategy strategy) {
-        printer.log(priority, tag, message, throwable, strategy);
+    public static void log(int priority, String tag, String message, Throwable throwable,
+                           @Nullable FormatStrategy strategy, @Nullable Class invokeClass) {
+        printer.log(priority, tag, message, throwable, strategy, invokeClass);
     }
 
     public static void d(String message, Object... args) {

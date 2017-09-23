@@ -5,7 +5,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.github.naturs.logger.Logger.*;
 
@@ -28,7 +30,16 @@ public final class Utils {
     public static boolean isEmpty(CharSequence str) {
         return str == null || str.length() == 0;
     }
-    
+
+    /**
+     * return true if the object array is null or 0-length.
+     * @param objects the object to be examined
+     * @return true if object is null or zero length
+     */
+    public static boolean isEmpty(Object[] objects) {
+        return objects == null || objects.length == 0;
+    }
+
     /**
      * Returns true if a and b are equal, including if they are both null.
      * <p><i>Note: In platform versions 1.1 and earlier, this method only worked well if
@@ -80,20 +91,107 @@ public final class Utils {
     }
 
     public static StackTraceElement getStackTraceElement(Class<?> invokeClass) {
+        if (invokeClass == null) {
+            return null;
+        }
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        
-        StackTraceElement targetElement = null;
-        
+
+        int index = getStackTraceElementIndex(stackTrace, invokeClass);
+        if (index == -1) {
+            return null;
+        }
+
+        return stackTrace[index];
+    }
+
+    public static StackTraceElement[] getStackTraceElement(Class<?> invokeClass, int methodCount, int methodOffset) {
+        if (invokeClass == null) {
+            return null;
+        }
+
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        int index = getStackTraceElementIndex(stackTrace, invokeClass);
+        if (index == -1) {
+            return null;
+        }
+
+        int stackOffset = index + methodOffset;
+
+        // corresponding method count with the current stack may exceeds the stack trace. Trims the count
+        if (methodCount + stackOffset > stackTrace.length) {
+            methodCount = stackTrace.length - stackOffset - 1;
+        }
+
+        List<StackTraceElement> targetElements = new ArrayList<>();
+
+        for (int i = methodCount; i > 0; i--) {
+            int stackIndex = i + stackOffset;
+            if (stackIndex >= stackTrace.length) {
+                continue;
+            }
+            targetElements.add(stackTrace[stackIndex]);
+        }
+
+        return targetElements.toArray(new StackTraceElement[targetElements.size()]);
+    }
+
+    /**
+     * get stacktrace info for specified classes.
+     */
+    public static StackTraceElement[] getStackTraceElement(Class<?>[] invokeClass, int methodCount, int methodOffset) {
+        if (isEmpty(invokeClass)) {
+            return null;
+        }
+
+        for (Class<?> clazz : invokeClass) {
+            StackTraceElement[] targetElements = getStackTraceElement(clazz, methodCount, methodOffset);
+            if (targetElements != null) {
+                return targetElements;
+            }
+        }
+
+        return null;
+    }
+
+    public static StackTraceElement getStackTraceElement(Class<?>[] invokeClass) {
+        if (isEmpty(invokeClass)) {
+            return null;
+        }
+
+        for (Class<?> clazz : invokeClass) {
+            StackTraceElement targetElement = getStackTraceElement(clazz);
+            if (targetElement != null) {
+                return targetElement;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * get stacktrace index for invoke class.
+     * @param stackTrace invoke stack
+     * @param invokeClass invoke class
+     * @return -1 if not found
+     */
+    public static int getStackTraceElementIndex(StackTraceElement[] stackTrace, Class<?> invokeClass) {
+        if (isEmpty(stackTrace) || invokeClass == null) {
+            return -1;
+        }
+
+        int targetIndex = -1;
+
         boolean shouldTrace = false;
-        for (StackTraceElement element : stackTrace) {
+        for (int i = 0; i < stackTrace.length; i ++) {
+            StackTraceElement element = stackTrace[i];
             boolean isInvokeMethod = element.getClassName().equals(invokeClass.getName());
             if (shouldTrace && !isInvokeMethod) {
-                targetElement = element;
+                targetIndex = i;
                 break;
             }
             shouldTrace = isInvokeMethod;
         }
-        return targetElement;
+        return targetIndex;
     }
 
     public static String getMethodInfo(StackTraceElement element) {

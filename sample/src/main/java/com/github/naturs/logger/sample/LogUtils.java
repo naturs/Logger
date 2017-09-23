@@ -9,7 +9,7 @@ import com.github.naturs.logger.Logger;
 public class LogUtils {
 
     public static void d(String msg) {
-        Logger.obj(msg);
+        Logger.invokeClass(LogUtils.class).obj(msg);
     }
 
 }

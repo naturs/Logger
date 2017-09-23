@@ -23,6 +23,10 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        Logger.d("d");
+        Logger.tag("a").d("d");
+        LogUtils.d("Log with LogUtils.java");
+//        if (true) return;
         Logger.obj("Optimize for single line.");
 
         Logger.tag("CustomTag").obj("I have a custom tag.");
