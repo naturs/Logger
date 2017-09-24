@@ -31,6 +31,10 @@ public final class Logger {
         }
     }
 
+    public static void setDebuggable(boolean debuggable) {
+        Logger.printer.setDebuggable(debuggable);
+    }
+
     public static void addLogAdapter(LogAdapter adapter) {
         printer.addAdapter(adapter);
     }
