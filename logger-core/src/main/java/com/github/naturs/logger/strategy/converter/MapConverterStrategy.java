@@ -11,6 +11,7 @@ import java.util.Set;
 public class MapConverterStrategy implements ConverterStrategy {
 
     private static final int INDENT = 4;
+    private static final int DEFAULT_PRIORITY = 400;
 
     @Override
     public String convert(@Nullable String message, @NotNull Object object, int level) {
@@ -42,6 +43,11 @@ public class MapConverterStrategy implements ConverterStrategy {
         builder.append(Utils.getSpace(level));
         builder.append("]");
         return Utils.concat(message, builder.toString(), DEFAULT_DIVIDER);
+    }
+
+    @Override
+    public int priority() {
+        return DEFAULT_PRIORITY;
     }
 
 }

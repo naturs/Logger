@@ -10,6 +10,7 @@ import java.util.List;
 
 public class ArrayConverterStrategy implements ConverterStrategy {
     private static final int INDENT = 4;
+    private static final int DEFAULT_PRIORITY = 200;
 
     @Override
     public String convert(@Nullable String message, @NotNull Object object, int level) {
@@ -28,5 +29,10 @@ public class ArrayConverterStrategy implements ConverterStrategy {
             return Utils.concat(message, builder.toString(), DEFAULT_DIVIDER);
         }
         return null;
+    }
+
+    @Override
+    public int priority() {
+        return DEFAULT_PRIORITY;
     }
 }

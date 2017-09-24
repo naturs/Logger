@@ -18,6 +18,7 @@ public class XmlConverterStrategy implements ConverterStrategy {
      * It is used for xml pretty print
      */
     private static final int XML_INDENT = 4;
+    private static final int DEFAULT_PRIORITY = 700;
 
     private final int indent;
 
@@ -50,5 +51,10 @@ public class XmlConverterStrategy implements ConverterStrategy {
             }
         }
         return null;
+    }
+
+    @Override
+    public int priority() {
+        return DEFAULT_PRIORITY;
     }
 }

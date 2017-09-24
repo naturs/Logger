@@ -4,25 +4,30 @@ import com.github.naturs.logger.strategy.converter.ConverterStrategy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * convert object to string.
  */
 public class ObjectConverter {
 
-    private final static List<ConverterStrategy> strategies = new ArrayList<>();
+    private final static Map<Integer, ConverterStrategy> strategies = new TreeMap<>();
 
     public static void add(ConverterStrategy strategy) {
         if (strategy != null) {
-            strategies.add(strategy);
+            int priority = strategy.priority();
+            if (strategies.containsKey(priority)) {
+                throw new RuntimeException(
+                        String.format("You must specify different priority for %s, the %s has the same priority.",
+                                strategy.getClass().getSimpleName(), strategies.get(priority).getClass().getSimpleName()));
+            }
+            strategies.put(priority, strategy);
         }
     }
 
     public static void remove(ConverterStrategy strategy) {
         if (strategy != null) {
-            strategies.remove(strategy);
+            strategies.remove(strategy.priority());
         }
     }
 
@@ -35,6 +40,7 @@ public class ObjectConverter {
     }
 
     public static String convert(@Nullable String message, @NotNull Object object, int level) {
+        Collection<ConverterStrategy> strategies = ObjectConverter.strategies.values();
         for (ConverterStrategy strategy : strategies) {
             String str = strategy.convert(message, object, level);
             if (str != null) {
@@ -44,18 +50,4 @@ public class ObjectConverter {
         throw new RuntimeException("you should add StringConverterStrategy at least.");
     }
 
-    public static String getSpace(int level) {
-        return getSpace(level, " ");
-    }
-
-    public static String getSpace(int level, @NotNull String space) {
-        if (level <= 0) {
-            return "";
-        }
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < level; i ++) {
-            builder.append(space);
-        }
-        return builder.toString();
-    }
 }

@@ -12,4 +12,10 @@ public class StringConverterStrategy implements ConverterStrategy {
     public String convert(@Nullable String message, @NotNull Object object, int level) {
         return Utils.concat(message, object.toString(), DEFAULT_DIVIDER);
     }
+
+    @Override
+    public int priority() {
+        // The string converter must be the last one.
+        return Integer.MAX_VALUE;
+    }
 }

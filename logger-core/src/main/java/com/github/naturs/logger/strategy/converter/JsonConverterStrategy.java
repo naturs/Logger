@@ -16,6 +16,7 @@ public class JsonConverterStrategy implements ConverterStrategy {
      * It is used for json pretty print
      */
     private static final int JSON_INDENT = 4;
+    private static final int DEFAULT_PRIORITY = 600;
 
     private final int indent;
 
@@ -56,5 +57,10 @@ public class JsonConverterStrategy implements ConverterStrategy {
         }
 
         return null;
+    }
+
+    @Override
+    public int priority() {
+        return DEFAULT_PRIORITY;
     }
 }

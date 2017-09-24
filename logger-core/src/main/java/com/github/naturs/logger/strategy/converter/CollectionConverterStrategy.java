@@ -11,6 +11,7 @@ import java.util.Iterator;
 public class CollectionConverterStrategy implements ConverterStrategy {
 
     private static final int INDENT = 4;
+    private static final int DEFAULT_PRIORITY = 300;
 
     @Override
     public String convert(@Nullable String message, @NotNull Object object, int level) {
@@ -43,5 +44,10 @@ public class CollectionConverterStrategy implements ConverterStrategy {
         builder.append(Utils.getSpace(level));
         builder.append("]");
         return builder.toString();
+    }
+
+    @Override
+    public int priority() {
+        return DEFAULT_PRIORITY;
     }
 }

@@ -8,6 +8,8 @@ import org.jetbrains.annotations.Nullable;
  * convert throwable to string.
  */
 public class ThrowableConverterStrategy implements ConverterStrategy {
+    private static final int DEFAULT_PRIORITY = 500;
+
     @Override
     public String convert(@Nullable String message, @NotNull Object object, int level) {
         if (object instanceof Throwable) {
@@ -35,5 +37,10 @@ public class ThrowableConverterStrategy implements ConverterStrategy {
             return Utils.concat(message, builder.toString(), DEFAULT_DIVIDER);
         }
         return null;
+    }
+
+    @Override
+    public int priority() {
+        return DEFAULT_PRIORITY;
     }
 }
