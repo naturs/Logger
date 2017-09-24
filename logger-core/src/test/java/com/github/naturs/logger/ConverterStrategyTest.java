@@ -26,7 +26,7 @@ public class ConverterStrategyTest {
         Map<String, String> map1 = new HashMap<>();
         map1.put("keykey1", "value1");
         map1.put("key2", "value2");
-        String result = ObjectConverter.convert("简单Map", map1);
+        String result = ObjectConverter.convert("简单Map", map1, 0);
         System.out.println(result);
 
         List list = new LinkedList();
@@ -48,7 +48,7 @@ public class ConverterStrategyTest {
         map2.put("key_fsdfadfadfdf4", new Throwable());
         map2.put("key_sdss5", new int[]{1,2,15,5854});
         map2.put("key_233", list);
-        result = ObjectConverter.convert("简单Map1", map2);
+        result = ObjectConverter.convert("简单Map1", map2, 0);
         System.out.println(result);
     }
 
@@ -74,7 +74,7 @@ public class ConverterStrategyTest {
         list.add(false);
         list.add(new Throwable());
         list.add(map2);
-        String result = ObjectConverter.convert("List", list);
+        String result = ObjectConverter.convert("List", list, 0);
 
         System.out.println(result);
     }

@@ -13,7 +13,7 @@ public class DefaultLogAdapter implements LogAdapter {
     /**
      * @param globalTag if you have not specify a tag, globalTag will be used.
      */
-    public DefaultLogAdapter(String globalTag) {
+    public DefaultLogAdapter(@Nullable String globalTag) {
         this.formatStrategy =
                 PrettyFormatStrategy
                         .newBuilder()

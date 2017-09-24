@@ -11,13 +11,14 @@ public class AndroidLogAdapter implements LogAdapter {
     
     private final FormatStrategy formatStrategy;
     
-    public AndroidLogAdapter() {
+    public AndroidLogAdapter(@Nullable String globalTag, boolean showThreadInfo) {
         this.formatStrategy =
                 PrettyFormatStrategy
                         .newBuilder()
+                        .tag(globalTag)
                         .logStrategy(new LogcatLogStrategy())
                         .optimizeSingleLine(true)
-                        .showThreadInfo(true)
+                        .showThreadInfo(showThreadInfo)
                         .build();
     }
     

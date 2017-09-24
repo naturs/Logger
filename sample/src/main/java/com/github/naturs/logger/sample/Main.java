@@ -2,7 +2,7 @@ package com.github.naturs.logger.sample;
 
 import com.github.naturs.logger.Logger;
 import com.github.naturs.logger.adapter.DefaultLogAdapter;
-import com.github.naturs.logger.strategy.converter.*;
+import com.github.naturs.logger.strategy.converter.DefaultLogConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,21 +12,13 @@ public class Main {
 
     static {
         Logger.addLogAdapter(new DefaultLogAdapter("Main."));
-        Logger.addConverterStrategy(new CollectionConverterStrategy());
-        Logger.addConverterStrategy(new MapConverterStrategy());
-        Logger.addConverterStrategy(new PrimaryConverterStrategy()); // int、boolean
-        Logger.addConverterStrategy(new ArrayConverterStrategy()); // int[]、boolean[]
-        Logger.addConverterStrategy(new ThrowableConverterStrategy());
-        Logger.addConverterStrategy(new JsonConverterStrategy());
-        Logger.addConverterStrategy(new XmlConverterStrategy());
-        Logger.addConverterStrategy(new StringConverterStrategy());
+        Logger.setLogConverter(new DefaultLogConverter());
     }
 
     public static void main(String[] args) {
         Logger.d("d");
         Logger.tag("a").d("d");
         LogUtils.d("Log with LogUtils.java");
-//        if (true) return;
         Logger.obj("Optimize for single line.");
 
         Logger.tag("CustomTag").obj("I have a custom tag.");

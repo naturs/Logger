@@ -135,7 +135,7 @@ public final class LoggerPrinter implements Printer {
 
     @Override
     public void obj(int priority, String message, Object object) {
-        log(priority, null, ObjectConverter.convert(message, object));
+        log(priority, null, ObjectConverter.convert(message, object, 0));
     }
 
     @Override

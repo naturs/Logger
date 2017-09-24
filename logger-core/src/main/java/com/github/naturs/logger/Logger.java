@@ -3,6 +3,7 @@ package com.github.naturs.logger;
 import com.github.naturs.logger.adapter.LogAdapter;
 import com.github.naturs.logger.internal.ObjectConverter;
 import com.github.naturs.logger.strategy.converter.ConverterStrategy;
+import com.github.naturs.logger.strategy.converter.LogConverter;
 import com.github.naturs.logger.strategy.format.FormatStrategy;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +37,12 @@ public final class Logger {
 
     public static void clearLogAdapters() {
         printer.clearLogAdapters();
+    }
+
+    public static void setLogConverter(LogConverter converter) {
+        if (converter != null) {
+            ObjectConverter.converter(converter);
+        }
     }
 
     public static void addConverterStrategy(ConverterStrategy strategy) {
