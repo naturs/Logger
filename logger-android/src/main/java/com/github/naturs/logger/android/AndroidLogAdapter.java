@@ -3,8 +3,8 @@ package com.github.naturs.logger.android;
 import com.github.naturs.logger.adapter.LogAdapter;
 import com.github.naturs.logger.strategy.format.PrettyFormatStrategy;
 import com.github.naturs.logger.strategy.format.FormatStrategy;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class AndroidLogAdapter implements LogAdapter {
     

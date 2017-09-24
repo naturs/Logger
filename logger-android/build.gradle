@@ -1,6 +1,7 @@
 dependencies {
     compile project(':logger-core')
     compileOnly rootProject.ext.androidLib
+    compileOnly rootProject.ext.jetbrainsAnnotations
     testCompile rootProject.ext.junit
 }
 

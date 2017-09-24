@@ -36,7 +36,7 @@ public class JsonConverterStrategy implements ConverterStrategy {
             try {
                 if (json.startsWith("{")) {
                     JSONObject jsonObject = new JSONObject(json);
-                    return jsonObject.toString(indent);
+                    return Utils.concat(message, jsonObject.toString(indent), DEFAULT_DIVIDER);
                 }
                 if (json.startsWith("[")) {
                     JSONArray jsonArray = new JSONArray(json);
