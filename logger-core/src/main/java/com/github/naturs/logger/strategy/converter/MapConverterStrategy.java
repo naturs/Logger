@@ -27,14 +27,17 @@ public class MapConverterStrategy implements ConverterStrategy {
 
         Set set = map.keySet();
 
+        int itemLevel = level + INDENT;
+        String itemSpace = Utils.getSpace(itemLevel);
+
         for (Object key : set) {
             Object value = map.get(key);
             if (value == null) {
                 value = "NULL";
             }
             String prefix = key.toString() + " -> ";
-            int itemLevel = level + INDENT;
-            builder.append(Utils.getSpace(itemLevel));
+
+            builder.append(itemSpace);
             builder.append(prefix);
             builder.append(ObjectConverter.convert(null, value, itemLevel  + prefix.length()));
             builder.append(DEFAULT_DIVIDER);
