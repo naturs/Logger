@@ -14,6 +14,11 @@ public interface ConverterStrategy {
     String DEFAULT_DIVIDER = /*System.getProperty("line.separator")*/"\n";
 
     /**
+     * Default indent for converter.
+     */
+    int DEFAULT_INDENT = 4;
+
+    /**
      * Convert object to an expected and formatted string.
      * @param message custom tip.
      * @param object the object to be converted.

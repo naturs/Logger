@@ -1,6 +1,7 @@
-package com.github.naturs.logger.android;
+package com.github.naturs.logger.android.adapter;
 
 import com.github.naturs.logger.adapter.LogAdapter;
+import com.github.naturs.logger.android.strategy.log.LogcatLogStrategy;
 import com.github.naturs.logger.strategy.format.PrettyFormatStrategy;
 import com.github.naturs.logger.strategy.format.FormatStrategy;
 import org.jetbrains.annotations.NotNull;

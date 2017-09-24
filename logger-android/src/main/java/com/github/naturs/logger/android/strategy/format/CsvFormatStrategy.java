@@ -1,8 +1,9 @@
-package com.github.naturs.logger.android;
+package com.github.naturs.logger.android.strategy.format;
 
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import com.github.naturs.logger.android.strategy.log.DiskLogStrategy;
 import com.github.naturs.logger.internal.Utils;
 import com.github.naturs.logger.strategy.format.FormatStrategy;
 import com.github.naturs.logger.strategy.log.LogStrategy;

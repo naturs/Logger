@@ -1,4 +1,4 @@
-package com.github.naturs.logger.android;
+package com.github.naturs.logger.android.strategy.log;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -26,12 +26,12 @@ public class DiskLogStrategy implements LogStrategy {
     handler.sendMessage(handler.obtainMessage(level, message));
   }
 
-  static class WriteHandler extends Handler {
+  public static class WriteHandler extends Handler {
 
     private final String folder;
     private final int maxFileSize;
 
-    WriteHandler(Looper looper, String folder, int maxFileSize) {
+    public WriteHandler(Looper looper, String folder, int maxFileSize) {
       super(looper);
       this.folder = folder;
       this.maxFileSize = maxFileSize;

@@ -1,4 +1,4 @@
-package com.github.naturs.logger.android;
+package com.github.naturs.logger.android.strategy.log;
 
 import android.util.Log;
 import com.github.naturs.logger.strategy.log.LogStrategy;
