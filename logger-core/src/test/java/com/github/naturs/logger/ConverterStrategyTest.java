@@ -1,7 +1,6 @@
 package com.github.naturs.logger;
 
 import com.github.naturs.logger.internal.ObjectConverter;
-import com.github.naturs.logger.strategy.converter.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,14 +10,6 @@ public class ConverterStrategyTest {
 
     @Before
     public void setup() {
-        ObjectConverter.add(new PrimaryConverterStrategy()); // int、boolean
-        ObjectConverter.add(new ArrayConverterStrategy()); // int[]、boolean[]
-        ObjectConverter.add(new CollectionConverterStrategy());
-        ObjectConverter.add(new MapConverterStrategy()); // map
-        ObjectConverter.add(new ThrowableConverterStrategy());
-        ObjectConverter.add(new JsonConverterStrategy());
-        ObjectConverter.add(new XmlConverterStrategy());
-        ObjectConverter.add(new StringConverterStrategy());
     }
 
     @Test
