@@ -19,6 +19,12 @@
 
 #### 一、添加依赖 ####
 
+	compile 'com.github.naturs.logger:logger-core:0.1'
+
+如果用于Android平台，则额外添加以下依赖：
+
+	compile 'com.github.naturs.logger:logger-android:0.1'
+
 #### 二、初始化 ####
 
 ```java
@@ -42,6 +48,81 @@ Logger.addConverterStrategy(YourCustomConverterStrategy);
 ```
 
 #### 三、使用 ####
+
+1、一般调用方式：
+
+```java
+// 使用当前调用Logger的类的类名作为Tag
+Logger.d("your log");
+// 自定义tag
+Logger.tag("CustomTag").d("your log");
+// 打印格式化后的json
+Logger.json(json);
+// 打印格式化后的xml
+Logger.xml(json);
+// 打印Object对象，Object的转换方式通过初始化中的LogConverter和ConverterStrategy指定
+Logger.obj(object);
+```
+
+2、如果想对日志进行单行输出（默认模式），则需要在初始化时进行设置，
+
+```java
+public DefaultLogAdapter(@Nullable String globalTag) {
+    this.formatStrategy =
+            PrettyFormatStrategy
+                    .newBuilder()
+                    .tag(globalTag)
+                    .methodCount(1)
+                    .showThreadInfo(false)
+                    .optimizeSingleLine(true) // 为true则代表在可能的情况下对日志进行单行输出
+                    .logStrategy(new DefaultLogStrategy())
+                    .build();
+}
+```
+
+如果要更改这一设置，则需要自定义`FormatStrategy`，
+
+```java
+public DefaultLogAdapter(FormatStrategy formatStrategy) {
+    this.formatStrategy = formatStrategy;
+}
+```
+
+3、一般情况下，直接使用`Logger`进行日志输出即可，部分情况下可能需要自定义一层封装，比如：
+
+```java
+public class LogUtils {
+
+    public static void d(String msg) {
+        Logger.obj(msg);
+    }
+
+}
+```
+
+之后使用LogUtils进行日志输出：
+
+```java
+LogUtils.d("Log with LogUtils.java");
+```
+
+这种情况下，日志输出的tag和定位的行数都会定位在`LogUtils`类中，
+
+	Main-LogUtils: [(LogUtils.java:12)#d] Log with LogUtils.java
+
+如果要显示调用`LogUtils`的类的tag和方法行数，可对`LogUtils`进行如下修改：
+
+```java
+public class LogUtils {
+    public static void d(String msg) {
+        Logger.invokeClass(LogUtils.class).obj(msg);
+    }
+}
+```
+
+之后的输出就会变为：
+
+	Main-Main: [(Main.java:86)#main] Log with LogUtils.java
 
 #### 四、效果 ####
 

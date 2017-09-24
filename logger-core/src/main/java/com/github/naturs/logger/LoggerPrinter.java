@@ -21,7 +21,9 @@ public final class LoggerPrinter implements Printer {
     private static final int MAX_TAG_LENGTH = 23;
     
     private static final String DEFAULT_LOG_TAG = "Logger";
-    
+
+    private boolean debuggable = true;
+
     /**
      * Provides one-time used tag for the log message
      */
@@ -60,6 +62,11 @@ public final class LoggerPrinter implements Printer {
             explicitInvokeClass.set(clazz);
         }
         return this;
+    }
+
+    @Override
+    public void setDebuggable(boolean debuggable) {
+        this.debuggable = debuggable;
     }
 
     @Override
@@ -135,14 +142,20 @@ public final class LoggerPrinter implements Printer {
 
     @Override
     public void obj(int priority, String message, Object object) {
+        if (!debuggable) {
+            return;
+        }
         log(priority, null, ObjectConverter.convert(message, object, 0));
     }
 
     @Override
     public synchronized void log(int priority, String tag, String message, Throwable throwable,
                                  @Nullable FormatStrategy strategy, @Nullable Class invokeClass) {
+        if (!debuggable) {
+            return;
+        }
         if (throwable != null && message != null) {
-            message += " : " + Utils.getStackTraceString(throwable);
+            message += " :\n" + Utils.getStackTraceString(throwable);
         }
         if (throwable != null && message == null) {
             message = Utils.getStackTraceString(throwable);
@@ -168,6 +181,9 @@ public final class LoggerPrinter implements Printer {
      * This method is synchronized in order to avoid messy of logs' order.
      */
     private synchronized void log(int priority, Throwable throwable, String msg, Object... args) {
+        if (!debuggable) {
+            return;
+        }
         Class invokeClass = getInvokeClass();
         String tag = getTag(invokeClass);
         FormatStrategy strategy = getFormatStrategy();

@@ -23,6 +23,8 @@ public class Main {
 
         Logger.tag("CustomTag").obj("I have a custom tag.");
 
+        Logger.e(new Throwable(), "出错了");
+
         String json = "{\"name\":\"abc\",\"age\":18,\"other\":{\"other1\":\"otherValue1\",\"other2\":otherValue2}}";
         Logger.i(json);
         Logger.json(json);

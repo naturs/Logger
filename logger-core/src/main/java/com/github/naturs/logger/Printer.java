@@ -18,6 +18,12 @@ public interface Printer {
 
     Printer invokeClass(Class clazz);
 
+    /**
+     * set if is debug mode
+     * @param debuggable logs will output if true
+     */
+    void setDebuggable(boolean debuggable);
+
     void d(String message, Object... args);
     
     void e(String message, Object... args);
