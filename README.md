@@ -19,11 +19,11 @@
 
 #### 一、添加依赖 ####
 
-	compile 'com.github.naturs.logger:logger-core:0.1'
+	compile 'com.github.naturs.logger:logger-core:0.3'
 
 如果用于Android平台，则额外添加以下依赖：
 
-	compile 'com.github.naturs.logger:logger-android:0.1'
+	compile 'com.github.naturs.logger:logger-android:0.3'
 
 #### 二、初始化 ####
 
