@@ -2,7 +2,12 @@ package com.github.naturs.logger.sample;
 
 import com.github.naturs.logger.Logger;
 import com.github.naturs.logger.adapter.DefaultLogAdapter;
+import com.github.naturs.logger.border.FineBorder;
+import com.github.naturs.logger.border.LogBorder;
+import com.github.naturs.logger.border.ThickBorder;
 import com.github.naturs.logger.strategy.converter.DefaultLogConverter;
+import com.github.naturs.logger.strategy.format.FormatStrategy;
+import com.github.naturs.logger.strategy.format.PrettyFormatStrategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +16,15 @@ import java.util.Map;
 public class Main {
 
     static {
-        Logger.addLogAdapter(new DefaultLogAdapter("Main."));
+        LogBorder border = new ThickBorder(true);
+//        LogBorder border = new FineBorder(false);
+        FormatStrategy formatStrategy = PrettyFormatStrategy.newBuilder()
+                .tag("Main.")
+                .showThreadInfo(true)
+                .optimizeSingleLine(false)
+                .logBorder(border)
+                .build();
+        Logger.addLogAdapter(new DefaultLogAdapter(formatStrategy));
         Logger.setLogConverter(new DefaultLogConverter());
     }
 

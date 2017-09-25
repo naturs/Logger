@@ -1,5 +1,7 @@
 package com.github.naturs.logger.strategy.format;
 
+import com.github.naturs.logger.border.LogBorder;
+import com.github.naturs.logger.border.ThickBorder;
 import com.github.naturs.logger.internal.Utils;
 import com.github.naturs.logger.strategy.log.DefaultLogStrategy;
 import com.github.naturs.logger.strategy.log.LogStrategy;
@@ -14,23 +16,11 @@ public class PrettyFormatStrategy implements FormatStrategy {
      */
     private static final int CHUNK_SIZE = 4000;
     
-    /**
-     * Drawing toolbox
-     */
-    private static final char TOP_LEFT_CORNER = '┌';
-    private static final char BOTTOM_LEFT_CORNER = '└';
-    private static final char MIDDLE_CORNER = '├';
-    private static final char HORIZONTAL_LINE = '│';
-    private static final String DOUBLE_DIVIDER = "────────────────────────────────────────────────────────";
-    private static final String SINGLE_DIVIDER = "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄";
-    private static final String TOP_BORDER = TOP_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
-    private static final String BOTTOM_BORDER = BOTTOM_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
-    private static final String MIDDLE_BORDER = MIDDLE_CORNER + SINGLE_DIVIDER + SINGLE_DIVIDER;
-    
     private final int methodCount;
     private final int methodOffset;
     private final boolean showThreadInfo;
     private final boolean optimizeSingleLine;
+    private final LogBorder logBorder;
     private final LogStrategy logStrategy;
     private final String tag;
     
@@ -39,6 +29,7 @@ public class PrettyFormatStrategy implements FormatStrategy {
         methodOffset = builder.methodOffset;
         showThreadInfo = builder.showThreadInfo;
         optimizeSingleLine = builder.optimizeSingleLine;
+        logBorder = builder.logBorder;
         logStrategy = builder.logStrategy;
         tag = builder.tag;
     }
@@ -88,13 +79,13 @@ public class PrettyFormatStrategy implements FormatStrategy {
     }
     
     private void logTopBorder(int logType, String tag) {
-        logChunk(logType, tag, TOP_BORDER);
+        logChunk(logType, tag, logBorder.topBorder());
     }
     
     @SuppressWarnings("StringBufferReplaceableByString")
     private void logHeaderContent(int logType, String tag, int methodCount, Class[] invokeClass) {
         if (showThreadInfo) {
-            logChunk(logType, tag, HORIZONTAL_LINE + " Thread: " + Thread.currentThread().getName());
+            logChunk(logType, tag, logBorder.leftBorder() + " Thread: " + Thread.currentThread().getName());
             logDivider(logType, tag);
         }
         String level = "";
@@ -104,7 +95,7 @@ public class PrettyFormatStrategy implements FormatStrategy {
         if (!Utils.isEmpty(elements)) {
             for (StackTraceElement element : elements) {
                 StringBuilder builder = new StringBuilder();
-                builder.append(HORIZONTAL_LINE)
+                builder.append(logBorder.leftBorder())
                         .append(' ')
                         .append(level)
                         .append(Utils.getSimpleClassName(element.getClassName()))
@@ -123,17 +114,19 @@ public class PrettyFormatStrategy implements FormatStrategy {
     }
     
     private void logBottomBorder(int logType, String tag) {
-        logChunk(logType, tag, BOTTOM_BORDER);
+        logChunk(logType, tag, logBorder.bottomBorder());
     }
     
     private void logDivider(int logType, String tag) {
-        logChunk(logType, tag, MIDDLE_BORDER);
+        if (logBorder.showMiddleBorder()) {
+            logChunk(logType, tag, logBorder.middleBorder());
+        }
     }
     
     private void logContent(int logType, String tag, String chunk) {
         String[] lines = chunk.split(LINE_SEPARATOR);
         for (String line : lines) {
-            logChunk(logType, tag, HORIZONTAL_LINE + " " + line);
+            logChunk(logType, tag, logBorder.leftBorder() + " " + line);
         }
     }
     
@@ -166,6 +159,7 @@ public class PrettyFormatStrategy implements FormatStrategy {
         int methodOffset = 0;
         boolean showThreadInfo = false;
         boolean optimizeSingleLine = false;
+        LogBorder logBorder;
         LogStrategy logStrategy;
         String tag = "PRETTY_LOGGER";
         
@@ -191,7 +185,12 @@ public class PrettyFormatStrategy implements FormatStrategy {
             showThreadInfo = val;
             return this;
         }
-        
+
+        public Builder logBorder(LogBorder logBorder) {
+            this.logBorder = logBorder;
+            return this;
+        }
+
         public Builder logStrategy(LogStrategy val) {
             logStrategy = val;
             return this;
@@ -203,6 +202,9 @@ public class PrettyFormatStrategy implements FormatStrategy {
         }
         
         public PrettyFormatStrategy build() {
+            if (logBorder == null) {
+                logBorder = new ThickBorder(true);
+            }
             if (logStrategy == null) {
                 logStrategy = new DefaultLogStrategy();
             }

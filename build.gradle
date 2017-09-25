@@ -12,7 +12,7 @@ buildscript {
 }
 
 ext {
-    version = '0.2'
+    version = '0.3'
     junit = 'junit:junit:4.12'
     json = 'org.json:json:20160212'
     androidLib = 'com.google.android:android:4.1.1.4'
